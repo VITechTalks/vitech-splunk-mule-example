@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config" doc:id="1e2b1489-adf3-4fde-a831-78af6766b137" >
+		<http:listener-connection host="0.0.0.0" port="8085" />
+	</http:listener-config>
+	<flow name="vitech-calc-apiFlow" doc:id="a1dffd8f-e366-4005-9ee4-b0356fb0c25b" >
+		<http:listener doc:name="Listener" doc:id="2fbff61f-d99f-4bcf-8e4c-e053455c5b48" config-ref="HTTP_Listener_config1" path="/calc"/>
+		<logger level="INFO" doc:name="Logger" doc:id="60fa8e92-3c92-444c-8ef6-bbeca1a6ad8d" message="-----------------Api flow Started ----------------input -#[attributes.queryParams]" category="splunk.logger"/>
+		<set-variable value="#[attributes.queryParams.num1 as Number]" doc:name="num1" doc:id="d2e6494d-74b2-4221-b6d1-9030e9a17f87" variableName="num1"/>
+		<set-variable value="#[attributes.queryParams.num2 as Number]" doc:name="num2" doc:id="5266929f-73ac-4dd1-b8e2-9d4bbdca70e5" variableName="num2" />
+		<ee:transform doc:name="Transform Message" doc:id="04e9388b-4c41-4cc9-bee2-5be234e9244c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Result" : "Sum of 2 numbers ="++(vars.num1 + vars.num2)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="4e6cf672-1e6e-4c09-b4db-0a7515cefb31" message="---------sum of 2 numbers flow is completd---------------------#[payload]" category="splunk.logger"/>
+	</flow>
+</mule>
